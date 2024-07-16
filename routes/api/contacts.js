@@ -37,7 +37,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:contactId', async (req, res, next) => {
   try {
-    const contact = await getContactById();
+    const contact = await getContactById(req.params.contactId);
     if (!contact) {
       res.status(404).json({ message: "contact not found" });
     } else {

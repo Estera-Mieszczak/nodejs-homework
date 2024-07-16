@@ -14,14 +14,18 @@ const getContactById = async (contactId) => {
   const foundContact = [];
 
   const isContactId = contacts.find((contact) => contact.id === contactId);
-  // const arrayWithContact = contacts.filter(
-  //   (contact) => contact.id === contactId
-  // );
+  const arrayWithContact = contacts.filter(
+    (contact) => contact.id === contactId
+  );
 
-  // const contact = arrayWithContact[0];
+  const contact = arrayWithContact[0];
   foundContact.push(isContactId);
+
+  if (isContactId) {
+    return contact;
+  }
   
-  return foundContact;
+  return false;
  
 }
 
