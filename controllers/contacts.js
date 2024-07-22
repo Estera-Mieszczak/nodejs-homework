@@ -128,12 +128,9 @@ const favouriteContact = async (req, res, next) => {
       toUpdate: { favorite },
     });
     if (result) {
-      res.json(result);
       res.status(200).json({
         message: `You  have changed contact status | ${req.body.name} `,
       });
-    } else {
-      next();
     }
   } catch (err) {
     next(err);
