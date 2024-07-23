@@ -34,6 +34,23 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(401).json({ message: "Email is wrong" });
+  }
+  const isPasswordCorrect = await user.validatePassword(password);
+
+  if (isPasswordCorrect) {
+    return res.json({ message: "You are logged in" });
+  } else {
+    return res.status(401).json({ message: "Password is wrong" });
+  }
+};
+
 module.exports = {
   createUser,
+  loginUser,
 };

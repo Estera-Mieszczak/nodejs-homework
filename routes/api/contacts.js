@@ -8,7 +8,7 @@ const {
   deleteContact,
   favouriteContact,
 } = require("../../controllers/contacts");
-const { createUser } = require("../../controllers/users");
+const { createUser, loginUser } = require("../../controllers/users");
 
 const router = express.Router();
 
@@ -21,5 +21,6 @@ router.delete("/contacts/:id", deleteContact);
 router.patch("/contacts/:id/favourite", favouriteContact);
 
 router.post("/users/signup", createUser);
+router.post("/users/login", loginUser);
 
 module.exports = router;
