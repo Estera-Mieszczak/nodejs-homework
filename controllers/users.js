@@ -1,5 +1,9 @@
 const User = require("../models/user");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
+const { SECRET } = process.env;
 
 const userSchema = Joi.object({
   email: Joi.string()
@@ -44,7 +48,11 @@ const loginUser = async (req, res) => {
   const isPasswordCorrect = await user.validatePassword(password);
 
   if (isPasswordCorrect) {
-    return res.json({ message: "You are logged in" });
+    const payload = {
+      id: user._id,
+    };
+    const token = jwt.sign(payload, SECRET, { expiresIn: "12h" });
+    return res.json({ token });
   } else {
     return res.status(401).json({ message: "Password is wrong" });
   }
