@@ -1,4 +1,5 @@
 const Contact = require("../models/contacts");
+const User = require("../models/user");
 
 const fetchContacts = () => {
   return Contact.find();
@@ -40,6 +41,10 @@ const updateStatusContact = ({ id, toUpdate }) => {
   );
 };
 
+const findUserById = async (id) => await User.findById(id);
+
+const updateUserById = async (id, obj) => await User.findByIdAndUpdate(id, obj);
+
 module.exports = {
   fetchContacts,
   fetchContact,
@@ -47,4 +52,6 @@ module.exports = {
   updateContact,
   removeContact,
   updateStatusContact,
+  findUserById,
+  updateUserById,
 };

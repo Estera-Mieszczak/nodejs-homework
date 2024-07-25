@@ -8,7 +8,11 @@ const {
   deleteContact,
   favouriteContact,
 } = require("../../controllers/contacts");
-const { createUser, loginUser } = require("../../controllers/users");
+const {
+  createUser,
+  loginUser,
+  logoutUser,
+} = require("../../controllers/users");
 const auth = require("../../middleware/jwt");
 
 const router = express.Router();
@@ -23,5 +27,6 @@ router.patch("/contacts/:id/favourite", auth, favouriteContact);
 
 router.post("/users/signup", createUser);
 router.post("/users/login", loginUser);
+router.put("/users/logout", auth, logoutUser);
 
 module.exports = router;

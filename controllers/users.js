@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const { findUserById, updateUserById } = require("./services");
 require("dotenv").config();
 
 const { SECRET } = process.env;
@@ -52,13 +53,31 @@ const loginUser = async (req, res) => {
       id: user._id,
     };
     const token = jwt.sign(payload, SECRET, { expiresIn: "12h" });
+    await updateUserById(user._id, { token });
     return res.json({ token });
   } else {
     return res.status(401).json({ message: "Password is wrong" });
   }
 };
 
+const logoutUser = async (req, res, next) => {
+  const { _id: id } = req.user;
+
+  try {
+    const user = await findUserById(id);
+
+    if (user) {
+      await updateUserById(id, { token: null });
+    }
+    res.status(204).json({ message: "User logged out" });
+  } catch (err) {
+    console.log(err);
+    next();
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
+  logoutUser,
 };
