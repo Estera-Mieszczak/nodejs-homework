@@ -53,7 +53,6 @@ const loginUser = async (req, res) => {
       id: user._id,
     };
     const token = jwt.sign(payload, SECRET, { expiresIn: "12h" });
-    await updateUserById(user._id, { token });
     return res.json({ token });
   } else {
     return res.status(401).json({ message: "Password is wrong" });
@@ -61,13 +60,15 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res, next) => {
-  const { _id: id } = req.user;
+  const { _id } = req.user;
+  console.log(_id);
 
   try {
-    const user = await findUserById(id);
+    const user = await findUserById(_id);
+    // console.log(user);
 
     if (user) {
-      await updateUserById(id, { token: null });
+      await updateUserById(_id, { token: null });
     }
     res.status(204).json({ message: "User logged out" });
   } catch (err) {

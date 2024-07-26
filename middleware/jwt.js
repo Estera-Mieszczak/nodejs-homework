@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
     if (!user || err) {
       return res.status(401).json({ message: "Not authorized" });
     }
-    res.locals.user = user;
+    req.user = user;
     next();
   })(req, res, next);
 };
