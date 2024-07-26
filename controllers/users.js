@@ -61,18 +61,35 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res, next) => {
   const { _id } = req.user;
-  console.log(_id);
+  console.log(req.user);
 
   try {
     const user = await findUserById(_id);
-    // console.log(user);
 
-    if (user) {
+    if (user.token) {
       await updateUserById(_id, { token: null });
     }
-    res.status(204).json({ message: "User logged out" });
-  } catch (err) {
-    console.log(err);
+    return res.status(204).json({ message: "Logged out" });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+const getUserById = async (req, res, next) => {
+  const { _id: id } = req.user;
+  console.log(req.user);
+
+  try {
+    const user = await findUserById(id);
+
+    if (!user) {
+      res.status(401).json({ message: "Not authorized" });
+    }
+
+    res.status(200).json({ message: `${user}` });
+  } catch (error) {
+    console.log(error);
     next();
   }
 };
@@ -81,4 +98,5 @@ module.exports = {
   createUser,
   loginUser,
   logoutUser,
+  getUserById,
 };
