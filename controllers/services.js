@@ -1,7 +1,8 @@
 const Contact = require("../models/contacts");
+const User = require("../models/user");
 
-const fetchContacts = () => {
-  return Contact.find();
+const fetchContacts = (userId) => {
+  return Contact.find({ owner: userId });
 };
 
 const fetchContact = (id) => {
@@ -10,12 +11,13 @@ const fetchContact = (id) => {
   });
 };
 
-const insertContact = ({ name, email, phone, favorite }) => {
+const insertContact = ({ name, email, phone, favorite, userId }) => {
   return Contact.create({
     name,
     email,
     phone,
     favorite,
+    owner: userId,
   });
 };
 
@@ -40,6 +42,10 @@ const updateStatusContact = ({ id, toUpdate }) => {
   );
 };
 
+const findUserById = async (id) => await User.findById(id);
+
+const updateUserById = async (id, obj) => await User.findByIdAndUpdate(id, obj);
+
 module.exports = {
   fetchContacts,
   fetchContact,
@@ -47,4 +53,6 @@ module.exports = {
   updateContact,
   removeContact,
   updateStatusContact,
+  findUserById,
+  updateUserById,
 };
