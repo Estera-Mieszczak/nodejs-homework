@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const { findUserById, updateUserById } = require("./services");
+const { findUserById } = require("./services");
 require("dotenv").config();
 
 const { SECRET } = process.env;
@@ -66,10 +66,9 @@ const logoutUser = async (req, res, next) => {
 
   try {
     const user = await findUserById(_id);
+    user.token = null;
+    user.save();
 
-    if (user.token !== null) {
-      await updateUserById(_id, { token: null });
-    }
     return res.status(200).json({ message: "Logged out" });
   } catch (error) {
     console.log(error);
@@ -79,7 +78,6 @@ const logoutUser = async (req, res, next) => {
 
 const getCurrentUser = async (req, res, next) => {
   const { _id: id } = req.user;
-  console.log(req.user);
 
   try {
     const user = await findUserById(id);
