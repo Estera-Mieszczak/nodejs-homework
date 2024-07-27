@@ -12,7 +12,7 @@ const {
   createUser,
   loginUser,
   logoutUser,
-  getUserById,
+  getCurrentUser,
 } = require("../../controllers/users");
 const auth = require("../../middleware/jwt");
 
@@ -29,6 +29,6 @@ router.patch("/contacts/:id/favourite", auth, favouriteContact);
 router.post("/users/signup", createUser);
 router.post("/users/login", loginUser);
 router.get("/users/logout", auth, logoutUser);
-router.get("/users/current", auth, getUserById);
+router.get("/users/current", auth, getCurrentUser);
 
 module.exports = router;

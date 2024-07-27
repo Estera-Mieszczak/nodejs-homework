@@ -53,6 +53,8 @@ const loginUser = async (req, res) => {
       id: user._id,
     };
     const token = jwt.sign(payload, SECRET, { expiresIn: "12h" });
+    user.token = token;
+    user.save();
     return res.json({ token });
   } else {
     return res.status(401).json({ message: "Password is wrong" });
@@ -61,22 +63,21 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res, next) => {
   const { _id } = req.user;
-  console.log(req.user);
 
   try {
     const user = await findUserById(_id);
 
-    if (user.token) {
+    if (user.token !== null) {
       await updateUserById(_id, { token: null });
     }
-    return res.status(204).json({ message: "Logged out" });
+    return res.status(200).json({ message: "Logged out" });
   } catch (error) {
     console.log(error);
     next(error);
   }
 };
 
-const getUserById = async (req, res, next) => {
+const getCurrentUser = async (req, res, next) => {
   const { _id: id } = req.user;
   console.log(req.user);
 
@@ -98,5 +99,5 @@ module.exports = {
   createUser,
   loginUser,
   logoutUser,
-  getUserById,
+  getCurrentUser,
 };

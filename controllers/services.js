@@ -1,8 +1,8 @@
 const Contact = require("../models/contacts");
 const User = require("../models/user");
 
-const fetchContacts = () => {
-  return Contact.find();
+const fetchContacts = (userId) => {
+  return Contact.find({ owner: userId });
 };
 
 const fetchContact = (id) => {
@@ -11,12 +11,13 @@ const fetchContact = (id) => {
   });
 };
 
-const insertContact = ({ name, email, phone, favorite }) => {
+const insertContact = ({ name, email, phone, favorite, userId }) => {
   return Contact.create({
     name,
     email,
     phone,
     favorite,
+    owner: userId,
   });
 };
 
