@@ -6,14 +6,11 @@
     <title>Document</title>
   </head>
   <body>
-    <form
-      id="avatarUpload"
-      action="/upload"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <input type="file" name="avatar" />
-      <button>Upload</button>
-    </form>
+    <img
+      alt="your avatar"
+      src="/avatars/<%= imgPaht %>"
+      width="250"
+      height="250"
+    />
   </body>
 </html>

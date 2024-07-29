@@ -1,11 +1,10 @@
 const express = require("express");
-const jimp = require("jimp");
 const path = require("path");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const apiRouter = require("./routes/api/contacts");
 // const { required } = require("joi");
-const { setupFolder } = require("./functions/functions");
+const { setupFolder, isImageAndTransform } = require("./functions/functions");
 const multer = require("multer");
 const { v4: uuidV4 } = require("uuid");
 const fs = require("fs").promises;
@@ -58,9 +57,32 @@ app.post(
     if (!req.file) {
       return res.status(400).json({ message: "File is not a photo" });
     }
-    res.json(req.file);
+
+    const { path: temporaryPath } = req.file;
+    const extension = path.extname(temporaryPath);
+    const fileName = `${uuidV4()}${extension}`;
+    const filePath = path.join(storageAvatarDir, fileName);
+
+    try {
+      await fs.rename(temporaryPath, filePath);
+    } catch (e) {
+      await fs.unlink(temporaryPath);
+      return next(e);
+    }
+
+    const isValidAndTransform = await isImageAndTransform(filePath);
+    if (!isValidAndTransform) {
+      await fs.unlink(filePath);
+      return res.status(400).json({ message: "Isnt a photo but pretending" });
+    }
+    res.redirect(`/avatars/${fileName}`);
   }
 );
+
+app.get("/avatars/:imgPath", (req, res) => {
+  const { imgPath } = req.params;
+  res.render("avatars", { imgPath });
+});
 
 app.use(express.json());
 app.use(cors());
