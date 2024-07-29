@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const { findUserById } = require("./services");
+const gravatar = require("gravatar");
 require("dotenv").config();
 
 const { SECRET } = process.env;
@@ -30,7 +31,12 @@ const createUser = async (req, res, next) => {
     return res.status(409).json({ message: "This email is already taken" });
   }
   try {
-    const newUser = new User({ email });
+    const generateAvatarURL = gravatar.url(email, {
+      protocol: "http",
+      s: "100",
+    });
+
+    const newUser = new User({ email, avatarURL: generateAvatarURL });
     await newUser.setPassword(password);
     await newUser.save();
     return res.status(201).json({ message: "Account created" });
