@@ -13,8 +13,10 @@ const {
   loginUser,
   logoutUser,
   getCurrentUser,
+  updateAvatar,
 } = require("../../controllers/users");
 const auth = require("../../middleware/jwt");
+// const upload = require("../../config/multer");
 
 const router = express.Router();
 
@@ -30,5 +32,6 @@ router.post("/users/signup", createUser);
 router.post("/users/login", loginUser);
 router.get("/users/logout", auth, logoutUser);
 router.get("/users/current", auth, getCurrentUser);
+router.patch("/users/avatars", auth, updateAvatar);
 
 module.exports = router;
