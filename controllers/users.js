@@ -1,8 +1,11 @@
 const User = require("../models/user");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const { findUserById } = require("./services");
+const { findUserById, updateUserById } = require("./services");
 const gravatar = require("gravatar");
+const path = require("path");
+
+const { resizeAvatar } = require("../functions/resizeAvatar");
 
 require("dotenv").config();
 
@@ -34,9 +37,9 @@ const createUser = async (req, res, next) => {
   try {
     const generateAvatarURL = gravatar.url(email, {
       protocol: "http",
-      s: "100",
+      s: "250",
     });
-
+    console.log(generateAvatarURL);
     const newUser = new User({ email, avatarURL: generateAvatarURL });
     await newUser.setPassword(password);
     await newUser.save();
@@ -101,17 +104,36 @@ const getCurrentUser = async (req, res, next) => {
 };
 
 const updateAvatar = async (res, req, next) => {
-  const { _id, email } = req.user;
+  const { path: filePath } = req.file;
+  const { _id } = req.user;
   console.log(req.user);
 
   try {
-    const user = await findUserById(_id);
-    const generateNewAvatarURL = gravatar.url(email, {
-      protocol: "http",
-      s: "100",
-    });
-    user.avatarURL = generateNewAvatarURL;
-    user.save();
+    const newFileName = `${_id}_avatar.jpg`;
+
+    const avatarsDir = path.join(
+      process.cwd(),
+      "public",
+      "avatars",
+      newFileName
+    );
+
+    const avatarURL = avatarsDir.slice(
+      avatarsDir.indexOf("avatars"),
+      avatarsDir.lenght
+    );
+
+    await resizeAvatar(filePath, avatarsDir);
+
+    await updateUserById(_id, { avatarURL });
+
+    // const user = await findUserById(_id);
+    // const generateNewAvatarURL = gravatar.url(email, {
+    //   protocol: "http",
+    //   s: "100",
+    // });
+    // user.avatarURL = generateNewAvatarURL;
+    // user.save();
 
     return res.status(200).json({ message: "Avatar changed" });
   } catch (error) {
