@@ -16,7 +16,7 @@ const {
   updateAvatar,
 } = require("../../controllers/users");
 const auth = require("../../middleware/jwt");
-const upload = require("../../config/multer");
+const { uploadMiddleware } = require("../../middleware/uploadMiddleware");
 
 const router = express.Router();
 
@@ -32,6 +32,15 @@ router.post("/users/signup", createUser);
 router.post("/users/login", loginUser);
 router.get("/users/logout", auth, logoutUser);
 router.get("/users/current", auth, getCurrentUser);
-router.patch("/users/avatars", auth, upload.single("avatar"), updateAvatar);
+router.patch(
+  "/users/avatars",
+  auth,
+  uploadMiddleware.single("avatar"),
+  updateAvatar
+);
+router.get("/avatars/:imgPath", (req, res) => {
+  const { imgPath } = req.params;
+  res.render("avatars", { imgPath });
+});
 
-module.exports = router;
+module.exports = { router };

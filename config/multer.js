@@ -1,17 +1,14 @@
-const path = require("path");
 const multer = require("multer");
-
-const uploadDir = path.join(process.cwd(), "temp");
+const path = require("path");
+const { v4: uuidV4 } = require("uuid");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir);
+    cb(null, path.join(__dirname, "temp"));
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, `${uuidV4()}${file.originalname}`);
   },
 });
 
-const upload = multer({ storage: storage });
-
-module.exports = upload;
+module.exports = { storage };

@@ -3,86 +3,49 @@ const path = require("path");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const apiRouter = require("./routes/api/contacts");
-// const { required } = require("joi");
-const { setupFolder, isImageAndTransform } = require("./functions/functions");
-const multer = require("multer");
-const { v4: uuidV4 } = require("uuid");
-const fs = require("fs").promises;
+const { setupFolder } = require("./functions/functions");
 
 const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.static(path.resolve(__dirname, "./public")));
 
+const tempDir = path.join(process.cwd(), "temp");
+const storageAvatarDir = path.join(process.cwd(), "public/avatars");
+
 require("dotenv").config();
 
 const { DB_HOST: urlDb } = process.env;
 const connection = mongoose.connect(urlDb);
 
-const tempDir = path.join(process.cwd(), "temp");
-const storageAvatarDir = path.join(process.cwd(), "public/avatars");
+// app.post(
+//   "/upload",
+//   uploadMiddleware.single("avatar"),
+//   async (req, res, next) => {
+//     if (!req.file) {
+//       return res.status(400).json({ message: "File is not a photo" });
+//     }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, tempDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${uuidV4()}${file.originalname}`);
-  },
-});
+//     const { path: temporaryPath } = req.file;
+//     const extension = path.extname(temporaryPath);
+//     const fileName = `${uuidV4()}${extension}`;
+//     const filePath = path.join(storageAvatarDir, fileName);
 
-const extensionWhiteList = [".jpg", ".jpeg", ".png", ".gif"];
-const mimetypeWhiteList = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
+//     try {
+//       await fs.rename(temporaryPath, filePath);
+//     } catch (e) {
+//       await fs.unlink(temporaryPath);
+//       return next(e);
+//     }
 
-const uploadMiddleware = multer({
-  storage,
-  fileFilter: async (req, file, cb) => {
-    const extension = path.extname(file.originalname).toLowerCase();
-    const mimetype = file.mimetype;
-    if (
-      !extensionWhiteList.includes(extension) ||
-      !mimetypeWhiteList.includes(mimetype)
-    ) {
-      return cb(null, false);
-    }
-    return cb(null, true);
-  },
-  limits: { fileSize: 1024 * 1024 * 5 },
-});
-
-app.post(
-  "/upload",
-  uploadMiddleware.single("avatar"),
-  async (req, res, next) => {
-    if (!req.file) {
-      return res.status(400).json({ message: "File is not a photo" });
-    }
-
-    const { path: temporaryPath } = req.file;
-    const extension = path.extname(temporaryPath);
-    const fileName = `${uuidV4()}${extension}`;
-    const filePath = path.join(storageAvatarDir, fileName);
-
-    try {
-      await fs.rename(temporaryPath, filePath);
-    } catch (e) {
-      await fs.unlink(temporaryPath);
-      return next(e);
-    }
-
-    const isValidAndTransform = await isImageAndTransform(filePath);
-    if (!isValidAndTransform) {
-      await fs.unlink(filePath);
-      return res.status(400).json({ message: "Isnt a photo but pretending" });
-    }
-    res.redirect(`/avatars/${fileName}`);
-  }
-);
-
-app.get("/avatars/:imgPath", (req, res) => {
-  const { imgPath } = req.params;
-  res.render("avatars", { imgPath });
-});
+//     const isValidAndTransform = await isImageAndTransform(filePath);
+//     if (!isValidAndTransform) {
+//       await fs.unlink(filePath);
+//       return res.status(400).json({ message: "Isnt a photo but pretending" });
+//     }
+//     res.redirect(`/avatars/${fileName}`);
+//   }
+// );
 
 app.use(express.json());
 app.use(cors());
