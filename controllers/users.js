@@ -31,14 +31,15 @@ const createUser = async (req, res, next) => {
   }
 
   const { email, password } = req.body;
-  const user = await User.findOne({ email }, { _id: 1 }).lean();
+  const user = await User.findOne({ email }).lean();
   if (user) {
     return res.status(409).json({ message: "This email is already taken" });
   }
   try {
     const generateAvatarURL = gravatar.url(email, {
-      protocol: "http",
       s: "250",
+      r: "pg",
+      d: "404",
     });
     console.log(generateAvatarURL);
     const newUser = new User({ email, avatarURL: generateAvatarURL });
@@ -104,13 +105,12 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
-const updateAvatar = async (res, req, next) => {
-  console.log(req.user);
-  // if (!req.file) {
-  //   return res.status(400).json({ message: "File is not a photo" });
-  // }
+const updateAvatar = async (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "File is not a photo" });
+  }
 
-  const storageAvatarDir = path.join(__dirname, "../public/avatars");
+  const storageAvatarDir = path.join(process.cwd(), "public/avatars");
 
   const { path: temporaryPath } = req.file;
   const extension = path.extname(temporaryPath);

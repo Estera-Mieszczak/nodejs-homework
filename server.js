@@ -72,7 +72,9 @@ const startServer = async () => {
     console.log("Database connection successful");
     app.listen(3000, async () => {
       await setupFolder(tempDir);
+      console.log("Folder temp created");
       await setupFolder(storageAvatarDir);
+      console.log("Folder avatars created");
       console.log("Server running. Use our API on port: 3000");
     });
   } catch (error) {
