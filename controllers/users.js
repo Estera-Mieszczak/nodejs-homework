@@ -105,9 +105,10 @@ const getCurrentUser = async (req, res, next) => {
 };
 
 const updateAvatar = async (res, req, next) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "File is not a photo" });
-  }
+  console.log(req.user);
+  // if (!req.file) {
+  //   return res.status(400).json({ message: "File is not a photo" });
+  // }
 
   const storageAvatarDir = path.join(__dirname, "../public/avatars");
 

@@ -1,6 +1,6 @@
 const multer = require("multer");
 const path = require("path");
-const { storage } = require("../config/multer.js");
+const storage = require("../config/multer.js");
 
 const extensionsWhiteList = [".jpg", ".jpeg", ".png", ".gif"];
 const mimetypeWhiteList = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
@@ -24,4 +24,4 @@ const uploadMiddleware = multer({
   },
 });
 
-module.exports = { uploadMiddleware };
+module.exports = uploadMiddleware;

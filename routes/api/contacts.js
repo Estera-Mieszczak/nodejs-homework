@@ -16,7 +16,7 @@ const {
   updateAvatar,
 } = require("../../controllers/users");
 const auth = require("../../middleware/jwt");
-const { uploadMiddleware } = require("../../middleware/uploadMiddleware");
+const uploadMiddleware = require("../../middleware/uploadMiddleware");
 
 const router = express.Router();
 
@@ -43,4 +43,4 @@ router.get("/avatars/:imgPath", (req, res) => {
   res.render("avatars", { imgPath });
 });
 
-module.exports = { router };
+module.exports = router;
