@@ -133,7 +133,8 @@ const updateAvatar = async (req, res, next) => {
   }
   const newAvatarURL = `/avatars/${fileName}`;
   req.user.avatarURL = newAvatarURL;
-  req.user.save();
+  // req.user = user;
+  // user.save();
   res.redirect(`/avatars/${fileName}`);
 };
 
