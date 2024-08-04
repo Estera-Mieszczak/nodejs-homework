@@ -179,9 +179,9 @@ const userReVerification = async (req, res, next) => {
     }
     const code = user.verificationToken;
     await sendEmail(
-      `<h1>Hello</h1><a href="http://localhost:3000/api/users/verify/${code}">Verify your account</a>`,
+      `<h1>Hello</h1><a href="http://localhost:3000/api/users/verify/${code}">Please, verify your account</a>`,
       "Welcome",
-      email
+      email.email
     );
     return res.status(200).json({ message: "Verification email sent" });
   } catch (err) {
