@@ -1,7 +1,15 @@
-const User = require("../models/user");
+const path = require("path");
+const fs = require("fs/promises");
+
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const { v4: uuidV4 } = require("uuid");
+
+const User = require("../models/user");
+const { isImageAndTransform } = require("../functions/functions");
 const { findUserById } = require("./services");
+
 require("dotenv").config();
 
 const { SECRET } = process.env;
@@ -25,12 +33,18 @@ const createUser = async (req, res, next) => {
   }
 
   const { email, password } = req.body;
-  const user = await User.findOne({ email }, { _id: 1 }).lean();
+  const user = await User.findOne({ email }).lean();
   if (user) {
     return res.status(409).json({ message: "This email is already taken" });
   }
   try {
-    const newUser = new User({ email });
+    const generateAvatarURL = gravatar.url(email, {
+      s: "250",
+      r: "pg",
+      d: "404",
+    });
+    console.log(generateAvatarURL);
+    const newUser = new User({ email, avatarURL: generateAvatarURL });
     await newUser.setPassword(password);
     await newUser.save();
     return res.status(201).json({ message: "Account created" });
@@ -93,9 +107,38 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
+const updateAvatar = async (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "File is not a photo" });
+  }
+
+  const storageAvatarDir = path.join(process.cwd(), "public/avatars");
+
+  const { path: temporaryPath } = req.file;
+  const extension = path.extname(temporaryPath);
+  const fileName = `${uuidV4()}${extension}`;
+  const filePath = path.join(storageAvatarDir, fileName);
+
+  try {
+    await fs.rename(temporaryPath, filePath);
+  } catch (e) {
+    await fs.unlink(temporaryPath);
+    return next(e);
+  }
+  const isValidAndTransform = await isImageAndTransform(filePath);
+  if (!isValidAndTransform) {
+    await fs.unlink(filePath);
+    return res.status(400).json({ message: "Isnt a photo but pretending" });
+  }
+  const newAvatarURL = `/avatars/${fileName}`;
+  req.user.avatarURL = newAvatarURL;
+  res.redirect(`/avatars/${fileName}`);
+};
+
 module.exports = {
   createUser,
   loginUser,
   logoutUser,
   getCurrentUser,
+  updateAvatar,
 };

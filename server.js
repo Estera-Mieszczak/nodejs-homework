@@ -1,10 +1,21 @@
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const app = express();
+
 const apiRouter = require("./routes/api/contacts");
+const { setupFolder } = require("./functions/functions");
+
+const app = express();
+
+app.set("view engine", "ejs");
+app.use(express.static(path.resolve(__dirname, "./public")));
+
+const tempDir = path.join(process.cwd(), "temp");
+const storageAvatarDir = path.join(process.cwd(), "public/avatars");
 
 require("dotenv").config();
+
 const { DB_HOST: urlDb } = process.env;
 const connection = mongoose.connect(urlDb);
 
@@ -31,7 +42,9 @@ const startServer = async () => {
   try {
     await connection;
     console.log("Database connection successful");
-    app.listen(3000, () => {
+    app.listen(3000, async () => {
+      await setupFolder(tempDir);
+      await setupFolder(storageAvatarDir);
       console.log("Server running. Use our API on port: 3000");
     });
   } catch (error) {
