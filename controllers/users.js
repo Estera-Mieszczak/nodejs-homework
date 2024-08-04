@@ -9,6 +9,7 @@ const { v4: uuidV4 } = require("uuid");
 const User = require("../models/user");
 const { isImageAndTransform } = require("../functions/functions");
 const { findUserById } = require("./services");
+const sendEmail = require("../functions/email");
 
 require("dotenv").config();
 
@@ -43,8 +44,17 @@ const createUser = async (req, res, next) => {
       r: "pg",
       d: "404",
     });
-    console.log(generateAvatarURL);
-    const newUser = new User({ email, avatarURL: generateAvatarURL });
+    const code = uuidV4();
+    const newUser = new User({
+      email,
+      avatarURL: generateAvatarURL,
+      verificationToken: code,
+    });
+    await sendEmail(
+      `<h1>Hello</h1><a href="http://localhost:3000/api/users/verify/${code}">Verify your account</a>`,
+      "Welcome",
+      email
+    );
     await newUser.setPassword(password);
     await newUser.save();
     return res.status(201).json({ message: "Account created" });
@@ -135,10 +145,30 @@ const updateAvatar = async (req, res, next) => {
   res.redirect(`/avatars/${fileName}`);
 };
 
+const userVerification = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({ verificationToken });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.verify = true;
+    user.verificationToken = null;
+    console.log(user);
+
+    await user.save();
+
+    res.status(200).json({ message: "Verification successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   logoutUser,
   getCurrentUser,
   updateAvatar,
+  userVerification,
 };
