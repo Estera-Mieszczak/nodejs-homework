@@ -139,7 +139,6 @@ const deleteContact = async (req, res, next) => {
 
   try {
     const contactToDelete = await fetchContact(contactId);
-    console.log(contactToDelete);
 
     if (contactToDelete.owner.toString() === userId.toString()) {
       await removeContact(contactId);

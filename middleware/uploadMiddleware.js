@@ -1,5 +1,6 @@
-const multer = require("multer");
 const path = require("path");
+const multer = require("multer");
+
 const storage = require("../config/multer.js");
 
 const extensionsWhiteList = [".jpg", ".jpeg", ".png", ".gif"];
@@ -10,7 +11,6 @@ const uploadMiddleware = multer({
   fileFilter: async (req, file, cb) => {
     const extension = path.extname(file.originalname).toLowerCase();
     const mimetype = file.mimetype;
-    console.log(mimetype);
     if (
       !extensionsWhiteList.includes(extension) ||
       !mimetypeWhiteList.includes(mimetype)

@@ -1,12 +1,14 @@
-const User = require("../models/user");
-const Joi = require("joi");
-const jwt = require("jsonwebtoken");
-const { findUserById } = require("./services");
-const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
+
+const Joi = require("joi");
+const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 const { v4: uuidV4 } = require("uuid");
+
+const User = require("../models/user");
 const { isImageAndTransform } = require("../functions/functions");
+const { findUserById } = require("./services");
 
 require("dotenv").config();
 
@@ -117,9 +119,6 @@ const updateAvatar = async (req, res, next) => {
   const fileName = `${uuidV4()}${extension}`;
   const filePath = path.join(storageAvatarDir, fileName);
 
-  console.log(`Temp Path: ${temporaryPath}`);
-  console.log(`Storage Avatar Dir: ${storageAvatarDir}`);
-
   try {
     await fs.rename(temporaryPath, filePath);
   } catch (e) {
@@ -133,8 +132,6 @@ const updateAvatar = async (req, res, next) => {
   }
   const newAvatarURL = `/avatars/${fileName}`;
   req.user.avatarURL = newAvatarURL;
-  // req.user = user;
-  // user.save();
   res.redirect(`/avatars/${fileName}`);
 };
 
