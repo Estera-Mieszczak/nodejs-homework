@@ -164,6 +164,31 @@ const userVerification = async (req, res, next) => {
   }
 };
 
+const userReVerification = async (req, res, next) => {
+  try {
+    const email = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "missing required field email" });
+    }
+    const user = await User.findOne(email);
+
+    if (user.verify === true) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+    const code = user.verificationToken;
+    await sendEmail(
+      `<h1>Hello</h1><a href="http://localhost:3000/api/users/verify/${code}">Verify your account</a>`,
+      "Welcome",
+      email
+    );
+    return res.status(200).json({ message: "Verification email sent" });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -171,4 +196,5 @@ module.exports = {
   getCurrentUser,
   updateAvatar,
   userVerification,
+  userReVerification,
 };

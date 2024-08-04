@@ -16,6 +16,7 @@ const {
   getCurrentUser,
   updateAvatar,
   userVerification,
+  userReVerification,
 } = require("../../controllers/users");
 
 const auth = require("../../middleware/jwt");
@@ -46,6 +47,7 @@ router.get("/avatars/:imgPath", (req, res) => {
   res.render("avatars", { imgPath });
 });
 router.get("/users/verify/:verificationToken", userVerification);
+router.post("/users/verify", userReVerification);
 
 router.get("/");
 
