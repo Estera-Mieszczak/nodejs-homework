@@ -23,6 +23,23 @@ const userSchema = new mongoose.Schema({
   avatarURL: {
     type: String,
   },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [
+      function () {
+        if (this.verify === true) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      "Verify token is required",
+    ],
+  },
 });
 
 userSchema.methods.setPassword = async function (password) {

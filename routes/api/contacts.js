@@ -8,13 +8,17 @@ const {
   deleteContact,
   favouriteContact,
 } = require("../../controllers/contacts");
+
 const {
   createUser,
   loginUser,
   logoutUser,
   getCurrentUser,
   updateAvatar,
+  userVerification,
+  userReVerification,
 } = require("../../controllers/users");
+
 const auth = require("../../middleware/jwt");
 const uploadMiddleware = require("../../middleware/uploadMiddleware");
 
@@ -42,5 +46,9 @@ router.get("/avatars/:imgPath", (req, res) => {
   const { imgPath } = req.params;
   res.render("avatars", { imgPath });
 });
+router.get("/users/verify/:verificationToken", userVerification);
+router.post("/users/verify", userReVerification);
+
+router.get("/");
 
 module.exports = router;
